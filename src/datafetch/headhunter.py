@@ -1,7 +1,8 @@
-import requests
 import configuration.settings
+import requests
 
 api_base_url = configuration.settings.HEADHUNTER_API_BASE_URL
+
 
 def fetch_vacancies(text, area=None, professional_role=None, currency=None, only_with_salary=None, period=30, page=0, per_page=100):
     """Fetch vacancies from HeadHunter API, return in json"""
@@ -9,7 +10,7 @@ def fetch_vacancies(text, area=None, professional_role=None, currency=None, only
     url_params = {
         'text': text,
         'area': area,
-        'professional_role': professional_role, 
+        'professional_role': professional_role,
         'currency': currency,
         'only_with_salary': only_with_salary,
         'period': period,
