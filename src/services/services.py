@@ -1,3 +1,11 @@
+from collections import defaultdict
+
+CURRENCIES_SIGNS = {
+    'RUR': '₽',
+    'EUR': '€',
+    'USD': '$',
+}
+
 
 def compute_expected_salary(vacancy, wanted_currency):
     """Compute and return expected salary
@@ -8,11 +16,13 @@ def compute_expected_salary(vacancy, wanted_currency):
     If wanted currency doesn't mach with currency of the vacancy, return None.
 
     Args:
-        vacancy (json): vacancy with relevant fields
-        https://github.com/hhru/api/blob/master/docs_eng/vacancies.md#short-description-of-the-vacancy 
-        wanted_currency (str): wanted currency of the salary
+        vacancy (json): 
+          vacancy with relevant fields
+          https://github.com/hhru/api/blob/master/docs_eng/vacancies.md#short-description-of-the-vacancy 
+        wanted_currency (str): 
+          wanted currency of the salary
 
-    Return:
+    Returns:
         calculated expected salary or None.
     """
     vacancy_salary_from = vacancy['salary']['from']
@@ -31,3 +41,44 @@ def compute_expected_salary(vacancy, wanted_currency):
             expected_salary = None
 
         return expected_salary
+
+
+def compute_vacancies_average_salary_statistic(vacancies, wanted_currency='RUR'):
+    """Compute average salary and return it with statistic as dictionary.
+
+    Args:
+        vacancies (list): List of vacancies. Each vacancy has fields listed here
+        https://github.com/hhru/api/blob/master/docs_eng/vacancies.md#short-description-of-the-vacancy
+        wanted_currency (str): wanted currency of the salary
+
+    Returns:
+        A dictionary with fields vacancies_found (int), vacancies_processed (int),
+        average_salary (dict).
+
+        For example:
+        {        
+            'vacancies_found': 10,
+            'vacancies_processed': 6,
+            'average_salary': {
+                'average_salary': 1500,
+                'currency': '$'
+                }
+        } 
+    """
+    cumulated_salaries = 0
+    vacancies_processed = 0
+    for vacancy in vacancies:
+        expected_salary = compute_expected_salary(vacancy, wanted_currency)
+        if expected_salary:
+            cumulated_salaries += expected_salary
+            vacancies_processed += 1
+
+    average_salary = (int(cumulated_salaries / vacancies_processed)
+                      if vacancies_processed != 0 else None)
+
+    return {
+        'vacancies_found': len(vacancies),
+        'vacancies_processed': vacancies_processed,
+        'average_salary': {'average_salary': average_salary,
+                           'currency': CURRENCIES_SIGNS[wanted_currency]}
+    }
