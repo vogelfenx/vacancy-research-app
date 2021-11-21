@@ -70,19 +70,26 @@ def main():
 
         # fetch vacancies
         try:
-            #all_vacancies = fetch_headhunter_vacancies(search_parameters_headhunter)
+            # all_vacancies = fetch_headhunter_vacancies(search_parameters_headhunter)
             all_vacancies = fetch_superjob_vacancies(search_parameters_superjob)
-            print(language, len(all_vacancies))
-
         except Exception as error:
             exit(f'Something went wrong: {error}')
 
         # calculate statistic for vacancies and group by searched text
-        #statistic = {}
+        statistic = {}
         # statistic[search_parameters_headhunter['text']] = (
         #    services.compute_vacancies_average_salary_statistic(all_vacancies)
         # )
-        # print(statistic)
+        vacancy_salaries = dict()
+        for vacancy in all_vacancies:
+            vacancy_salaries.update({
+                vacancy['id']: {
+                    'salary_from': vacancy['payment_from'],
+                    'salary_to': vacancy['payment_to']
+                }
+            })
+        statistic[language] = services.compute_vacancies_average_salary(vacancy_salaries)
+        print(statistic)
 
 
 if __name__ == '__main__':
