@@ -70,15 +70,16 @@ def compute_vacancies_average_salary_statistic(vacancies, wanted_currency='RUR')
     for vacancy in vacancies:
         expected_salary = compute_expected_salary(vacancy, wanted_currency)
         if expected_salary:
+            # print(vacancy['alternate_url'])
             cumulated_salaries += expected_salary
             vacancies_processed += 1
 
-    average_salary = (int(cumulated_salaries / vacancies_processed)
-                      if vacancies_processed != 0 else None)
-
-    return {
-        'vacancies_found': len(vacancies),
-        'vacancies_processed': vacancies_processed,
-        'average_salary': {'average_salary': average_salary,
-                           'currency': CURRENCIES_SIGNS[wanted_currency]}
-    }
+    if vacancies_processed > 0:
+        return {
+            'vacancies_found': len(vacancies),
+            'vacancies_processed': vacancies_processed,
+            'average_salary': {
+                'average_salary': int(cumulated_salaries / vacancies_processed),
+                'currency': CURRENCIES_SIGNS[wanted_currency]
+            }
+        }
