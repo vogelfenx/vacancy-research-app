@@ -47,6 +47,30 @@ def fetch_superjob_vacancies(search_parameters):
     return vacancies
 
 
+def calculate_statistic_for_suberjob(vacancies):
+    vacancy_salaries = dict()
+    for vacancy in vacancies:
+        vacancy_salaries.update({
+            vacancy['id']: {
+                'salary_from': vacancy['payment_from'],
+                'salary_to': vacancy['payment_to']
+            }
+        })
+    return services.compute_vacancies_average_salary(vacancy_salaries)
+
+
+def calculate_statistic_for_headhunter(vacancies):
+    vacancy_salaries = dict()
+    for vacancy in vacancies:
+        vacancy_salaries.update({
+            vacancy['id']: {
+                'salary_from': vacancy['salary']['from'],
+                'salary_to': vacancy['salary']['to']
+            }
+        })
+    return services.compute_vacancies_average_salary(vacancy_salaries)
+
+
 def main():
     popular_languages = ['Python', 'Java', 'JavaScript',
                          'C#', 'C/C++', 'PHP', 'Kotlin', 'COBOL']
@@ -70,26 +94,23 @@ def main():
 
         # fetch vacancies
         try:
-            # all_vacancies = fetch_headhunter_vacancies(search_parameters_headhunter)
-            all_vacancies = fetch_superjob_vacancies(search_parameters_superjob)
+            headhunter_vacancies = fetch_headhunter_vacancies(search_parameters_headhunter)
+            # superjob_vacancies = fetch_superjob_vacancies(search_parameters_superjob)
         except Exception as error:
             exit(f'Something went wrong: {error}')
 
-        # calculate statistic for vacancies and group by searched text
-        statistic = {}
-        # statistic[search_parameters_headhunter['text']] = (
-        #    services.compute_vacancies_average_salary_statistic(all_vacancies)
-        # )
-        vacancy_salaries = dict()
-        for vacancy in all_vacancies:
-            vacancy_salaries.update({
-                vacancy['id']: {
-                    'salary_from': vacancy['payment_from'],
-                    'salary_to': vacancy['payment_to']
-                }
-            })
-        statistic[language] = services.compute_vacancies_average_salary(vacancy_salaries)
-        print(statistic)
+        # calculate statistic for vacancies and group by searched text or keyword
+        get_statistic_headhunter = {}
+        get_statistic_superjob = {}
+        get_statistic_headhunter.update({
+            language: calculate_statistic_for_headhunter(headhunter_vacancies)
+        })
+        # get_statistic_superjob.update({
+        #     language: calculate_statistic_for_suberjob(superjob_vacancies)
+        # })
+
+        print(get_statistic_headhunter)
+        print(get_statistic_superjob)
 
 
 if __name__ == '__main__':
