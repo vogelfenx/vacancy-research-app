@@ -10,7 +10,6 @@ pp = json.dumps
 
 def fetch_headhunter_vacancies(search_parameters):
     """Fetch HeadHunter vacancies and return it as list of dictionares"""
-
     vacancies = []
     page = 0
     pages_count = 1
@@ -26,6 +25,7 @@ def fetch_headhunter_vacancies(search_parameters):
 
 
 def fetch_superjob_vacancies(search_parameters):
+    """Fetch SuperJob vacancies and return it as list of dictionares"""
     vacancies = []
     next_page = True
     page = 0
@@ -66,6 +66,7 @@ def calculate_statistic_for_headhunter(vacancies, wanted_currency='RUR'):
 
 
 def print_statistic_table(statistic, title='Statistic'):
+    """Print the given salary statistic as a table"""
     statistic_fields = [
         ['Language', 'vacancies found', 'vacancies processed', 'average salary'],
     ]
