@@ -1,8 +1,6 @@
 import json
 
-import requests
-from requests.exceptions import ConnectionError, HTTPError
-from terminaltables import AsciiTable, DoubleTable, SingleTable
+from terminaltables import AsciiTable
 
 from datafetch import headhunter, superjob
 from services import services
