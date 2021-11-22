@@ -40,30 +40,29 @@ def fetch_superjob_vacancies(search_parameters):
 
 
 def calculate_statistic_for_suberjob(vacancies, wanted_currency='rub'):
-    vacancy_salaries = dict()
+    """Calculate salary statistic for given vacancies."""
+    vacancies_salaries = list()
+
     for vacancy in vacancies:
-        vacancy_salaries.update({
-            vacancy['id']: {
-                'salary_from': vacancy['payment_from'],
-                'salary_to': vacancy['payment_to'],
-                'salary_currency': vacancy['currency']
-            }
-        })
-    return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
+        vacancies_salaries.append({'salary_from': vacancy['payment_from'],
+                                   'salary_to': vacancy['payment_to'],
+                                   'salary_currency': vacancy['currency']
+                                   })
+
+    return services.compute_vacancies_average_salary(vacancies_salaries, wanted_currency)
 
 
 def calculate_statistic_for_headhunter(vacancies, wanted_currency='RUR'):
-    vacancy_salaries = dict()
+    """Calculate salary statistic for given vacancies."""
+    vacancies_salaries = list()
 
     for vacancy in vacancies:
-        vacancy_salaries.update({
-            vacancy['id']: {
-                'salary_from': vacancy['salary']['from'],
-                'salary_to': vacancy['salary']['to'],
-                'salary_currency': vacancy['salary']['currency']
-            }
-        })
-    return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
+        vacancies_salaries.append({'salary_from': vacancy['salary']['from'],
+                                   'salary_to': vacancy['salary']['to'],
+                                   'salary_currency': vacancy['salary']['currency']
+                                   })
+
+    return services.compute_vacancies_average_salary(vacancies_salaries, wanted_currency)
 
 
 def print_statistic_table(statistic, title='Statistic'):
