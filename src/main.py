@@ -9,13 +9,6 @@ from services import services
 pp = json.dumps
 
 
-CURRENCIES_SIGNS = {
-    'RUR': '₽',
-    'EUR': '€',
-    'USD': '$',
-}
-
-
 def fetch_headhunter_vacancies(search_parameters):
     """Fetch HeadHunter vacancies and return it as list of dictionares"""
 
@@ -47,28 +40,31 @@ def fetch_superjob_vacancies(search_parameters):
     return vacancies
 
 
-def calculate_statistic_for_suberjob(vacancies):
+def calculate_statistic_for_suberjob(vacancies, wanted_currency='eur'):
     vacancy_salaries = dict()
     for vacancy in vacancies:
         vacancy_salaries.update({
             vacancy['id']: {
                 'salary_from': vacancy['payment_from'],
-                'salary_to': vacancy['payment_to']
+                'salary_to': vacancy['payment_to'],
+                'salary_currency': vacancy['currency']
             }
         })
-    return services.compute_vacancies_average_salary(vacancy_salaries)
+    return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
 
 
-def calculate_statistic_for_headhunter(vacancies):
+def calculate_statistic_for_headhunter(vacancies, wanted_currency='EUR'):
     vacancy_salaries = dict()
+
     for vacancy in vacancies:
         vacancy_salaries.update({
             vacancy['id']: {
                 'salary_from': vacancy['salary']['from'],
-                'salary_to': vacancy['salary']['to']
+                'salary_to': vacancy['salary']['to'],
+                'salary_currency': vacancy['salary']['currency']
             }
         })
-    return services.compute_vacancies_average_salary(vacancy_salaries)
+    return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
 
 
 def main():
@@ -95,7 +91,7 @@ def main():
         # fetch vacancies
         try:
             headhunter_vacancies = fetch_headhunter_vacancies(search_parameters_headhunter)
-            # superjob_vacancies = fetch_superjob_vacancies(search_parameters_superjob)
+            superjob_vacancies = fetch_superjob_vacancies(search_parameters_superjob)
         except Exception as error:
             exit(f'Something went wrong: {error}')
 
@@ -105,9 +101,9 @@ def main():
         get_statistic_headhunter.update({
             language: calculate_statistic_for_headhunter(headhunter_vacancies)
         })
-        # get_statistic_superjob.update({
-        #     language: calculate_statistic_for_suberjob(superjob_vacancies)
-        # })
+        get_statistic_superjob.update({
+            language: calculate_statistic_for_suberjob(superjob_vacancies)
+        })
 
         print(get_statistic_headhunter)
         print(get_statistic_superjob)

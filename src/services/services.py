@@ -1,7 +1,15 @@
 from collections import defaultdict
 
 
-def compute_expected_salary(salary_from, salary_to):
+CURRENCIES_SIGNS = {
+    'RUR': '₽',
+    'rub': '₽',
+    'EUR': '€',
+    'USD': '$',
+}
+
+
+def compute_expected_salary(salary_from, salary_to, **kwargs):
     """Compute and return expected salary
 
     Expected salary compute using the "from" & "to" salary fields of the vacancy.  
@@ -33,7 +41,7 @@ def compute_expected_salary(salary_from, salary_to):
     return expected_salary
 
 
-def compute_vacancies_average_salary(vacancies_salary):
+def compute_vacancies_average_salary(vacancies_salary, wanted_currency):
     """Compute average salary and return it with statistic as dictionary.
 
     Args:
@@ -52,9 +60,15 @@ def compute_vacancies_average_salary(vacancies_salary):
             'average_salary': 1500
         } 
     """
+    vacancies_count = len(vacancies_salary)
     cumulated_salaries = 0
     vacancies_processed = 0
-    for vacancy in vacancies_salary.values():
+
+    # filter vacancies by the given wanted currency
+    vacancies_salary = [vacancy for vacancy in vacancies_salary.values()
+                        if vacancy['salary_currency'] == wanted_currency]
+
+    for vacancy in vacancies_salary:
         expected_salary = compute_expected_salary(**vacancy)
         if expected_salary:
             cumulated_salaries += expected_salary
@@ -62,8 +76,9 @@ def compute_vacancies_average_salary(vacancies_salary):
 
     if vacancies_processed > 0:
         return {
-            'vacancies_found': len(vacancies_salary),
+            'vacancies_found': vacancies_count,
             'vacancies_processed': vacancies_processed,
-            'average_salary': int(cumulated_salaries / vacancies_processed)
+            'average_salary': f'{int(cumulated_salaries / vacancies_processed)}'
+                              f'{CURRENCIES_SIGNS[wanted_currency]}'
 
         }
