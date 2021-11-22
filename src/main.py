@@ -1,7 +1,8 @@
 import json
-import requests
 
+import requests
 from requests.exceptions import ConnectionError, HTTPError
+from terminaltables import AsciiTable, DoubleTable, SingleTable
 
 from datafetch import headhunter, superjob
 from services import services
@@ -40,7 +41,7 @@ def fetch_superjob_vacancies(search_parameters):
     return vacancies
 
 
-def calculate_statistic_for_suberjob(vacancies, wanted_currency='eur'):
+def calculate_statistic_for_suberjob(vacancies, wanted_currency='rub'):
     vacancy_salaries = dict()
     for vacancy in vacancies:
         vacancy_salaries.update({
@@ -53,7 +54,7 @@ def calculate_statistic_for_suberjob(vacancies, wanted_currency='eur'):
     return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
 
 
-def calculate_statistic_for_headhunter(vacancies, wanted_currency='EUR'):
+def calculate_statistic_for_headhunter(vacancies, wanted_currency='RUR'):
     vacancy_salaries = dict()
 
     for vacancy in vacancies:
@@ -65,6 +66,22 @@ def calculate_statistic_for_headhunter(vacancies, wanted_currency='EUR'):
             }
         })
     return services.compute_vacancies_average_salary(vacancy_salaries, wanted_currency)
+
+
+def print_statistic_table(statistic, title='Statistic'):
+    statistic_fields = [
+        ['Language', 'vacancies found', 'vacancies processed', 'average salary'],
+    ]
+
+    # filter out None vacancies
+    statistic = {language: vacancies_statistic
+                 for language, vacancies_statistic in statistic.items() if vacancies_statistic}
+
+    for language, vacancy_statistic in statistic.items():
+        statistic_fields.append([language, *(vacancy_statistic.values())])
+
+    table = AsciiTable(statistic_fields, title)
+    print(table.table)
 
 
 def main():
@@ -84,6 +101,8 @@ def main():
         'period': 0,  # possible values 1 3 7 0
     }
 
+    statistic_headhunter = {}
+    statistic_superjob = {}
     for language in popular_languages:
         search_parameters_headhunter['text'] = language
         search_parameters_superjob['keyword'] = language
@@ -96,17 +115,18 @@ def main():
             exit(f'Something went wrong: {error}')
 
         # calculate statistic for vacancies and group by searched text or keyword
-        get_statistic_headhunter = {}
-        get_statistic_superjob = {}
-        get_statistic_headhunter.update({
+        statistic_headhunter.update({
             language: calculate_statistic_for_headhunter(headhunter_vacancies)
         })
-        get_statistic_superjob.update({
+        statistic_superjob.update({
             language: calculate_statistic_for_suberjob(superjob_vacancies)
         })
 
-        print(get_statistic_headhunter)
-        print(get_statistic_superjob)
+    print_statistic_table(statistic_headhunter,
+                          f'HeadHunter')
+
+    print_statistic_table(statistic_superjob,
+                          f'SuperJob')
 
 
 if __name__ == '__main__':
