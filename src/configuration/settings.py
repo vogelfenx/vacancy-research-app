@@ -9,3 +9,6 @@ SUPERJOB_API_BASE_URL = config['SUPERJOB_API_BASE_URL']
 
 # secrets
 SUPERJOB_API_ACCESS_TOKEN = secrets['SUPERJOB_API_ACCESS_TOKEN']
+
+# user configuration
+programming_languages = [lang for lang in config['PROGRAMMING_LANGUAGES'].split(',')]
