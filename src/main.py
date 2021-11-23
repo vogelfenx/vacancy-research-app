@@ -1,7 +1,10 @@
+import argparse
+from collections import defaultdict
 import json
 
 from terminaltables import AsciiTable
 
+from configuration import settings
 from datafetch import headhunter, superjob
 from services import services
 
@@ -39,9 +42,12 @@ def fetch_superjob_vacancies(search_parameters):
     return vacancies
 
 
-def calculate_statistic_for_suberjob(vacancies, wanted_currency='rub'):
+def calculate_statistic_for_suberjob(vacancies, wanted_currency):
     """Calculate salary statistic for given vacancies."""
     vacancies_salaries = list()
+
+    if not wanted_currency:
+        wanted_currency = 'rub'
 
     for vacancy in vacancies:
         vacancies_salaries.append({'salary_from': vacancy['payment_from'],
@@ -52,9 +58,12 @@ def calculate_statistic_for_suberjob(vacancies, wanted_currency='rub'):
     return services.compute_vacancies_average_salary(vacancies_salaries, wanted_currency)
 
 
-def calculate_statistic_for_headhunter(vacancies, wanted_currency='RUR'):
+def calculate_statistic_for_headhunter(vacancies, wanted_currency):
     """Calculate salary statistic for given vacancies."""
     vacancies_salaries = list()
+
+    if not wanted_currency:
+        wanted_currency = 'RUR'
 
     for vacancy in vacancies:
         vacancies_salaries.append({'salary_from': vacancy['salary']['from'],
@@ -82,21 +91,40 @@ def print_statistic_table(statistic, title='Statistic'):
     print(table.table)
 
 
+def parse_cli_args():
+    program_description = """ Collect & print statistic of salaries 
+                              for given programming languages\n'
+                              Specify these languages in .config file. """
+
+    parser = argparse.ArgumentParser(description=program_description)
+    parser.add_argument('--currency_hh',
+                        choices=['EUR', 'USD', 'RUR'],
+                        help='Specify the currency to search for jobs on HeadHunter by specific currency',
+                        default=None)
+    parser.add_argument('--currency_sj',
+                        choices=['rub', 'uah', 'uzs'],
+                        help='Specify the currency to search for jobs on HeadHunter by specific currency',
+                        default=None)
+
+    return parser.parse_args()
+
+
 def main():
-    popular_languages = ['Python', 'Java', 'JavaScript',
-                         'C#', 'C/C++', 'PHP', 'Kotlin', 'COBOL']
+    args = parse_cli_args()
+    popular_languages = settings.programming_languages
 
     search_parameters_headhunter = {
         'area': 1,  # 1 = Moscow
-        'professional_role': 96,  # 96 = Developer
+        'professional_role': 96,
         'only_with_salary': 'true',
+        'currency': args.currency_hh,
         'period': 30,
     }
     search_parameters_superjob = {
         'town': 4,  # 4 = Moscow
         'catalogues': 48,
-        'currency': 'rub',
-        'period': 0,  # possible values 1 3 7 0
+        'currency': args.currency_sj,
+        'period': 0,
     }
 
     statistic_headhunter = {}
@@ -114,10 +142,12 @@ def main():
 
         # calculate statistic for vacancies and group by searched text or keyword
         statistic_headhunter.update({
-            language: calculate_statistic_for_headhunter(headhunter_vacancies)
+            language: calculate_statistic_for_headhunter(
+                headhunter_vacancies, search_parameters_headhunter['currency'])
         })
         statistic_superjob.update({
-            language: calculate_statistic_for_suberjob(superjob_vacancies)
+            language: calculate_statistic_for_suberjob(
+                superjob_vacancies, search_parameters_superjob['currency'])
         })
 
     print_statistic_table(statistic_headhunter,
