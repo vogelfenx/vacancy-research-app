@@ -92,9 +92,9 @@ def print_statistic_table(statistic, title='Statistic'):
 
 
 def parse_cli_args():
-    program_description = """ Collect & print statistic of salaries 
-                              for given programming languages\n'
-                              Specify these languages in .config file. """
+    program_description = ('Collect & print statistic of salaries '
+                           'for given programming languages\n'
+                           'Specify these languages in .config file.')
 
     parser = argparse.ArgumentParser(description=program_description)
     parser.add_argument('--currency_hh',
@@ -103,7 +103,7 @@ def parse_cli_args():
                         default='RUR')
     parser.add_argument('--currency_sj',
                         choices=['rub', 'uah', 'uzs'],
-                        help='Currency of vacancies on HeadHunter to search for',
+                        help='Currency of vacancies on SuperJob to search for',
                         default='rub')
 
     return parser.parse_args()
