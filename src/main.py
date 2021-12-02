@@ -99,12 +99,12 @@ def parse_cli_args():
     parser = argparse.ArgumentParser(description=program_description)
     parser.add_argument('--currency_hh',
                         choices=['EUR', 'USD', 'RUR'],
-                        help='Specify the currency to search for jobs on HeadHunter by specific currency',
-                        default=None)
+                        help='Currency of vacancies on HeadHunter to search for',
+                        default='RUR')
     parser.add_argument('--currency_sj',
                         choices=['rub', 'uah', 'uzs'],
-                        help='Specify the currency to search for jobs on HeadHunter by specific currency',
-                        default=None)
+                        help='Currency of vacancies on HeadHunter to search for',
+                        default='rub')
 
     return parser.parse_args()
 
@@ -151,10 +151,10 @@ def main():
         })
 
     print_statistic_table(statistic_headhunter,
-                          f'HeadHunter')
+                          'HeadHunter')
 
     print_statistic_table(statistic_superjob,
-                          f'SuperJob')
+                          'SuperJob')
 
 
 if __name__ == '__main__':
