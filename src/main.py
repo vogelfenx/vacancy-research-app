@@ -140,7 +140,7 @@ def main():
         except Exception as error:
             exit(f'Something went wrong: {error}')
 
-        # calculate statistic for vacancies and group by searched text or keyword
+        # calculate statistic for vacancies and group by searched text or keyword (e.g. by programming language)
         statistic_headhunter.update({
             language: calculate_statistic_for_headhunter(
                 headhunter_vacancies, search_parameters_headhunter['currency'])
