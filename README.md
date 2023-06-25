@@ -96,7 +96,3 @@ Used sources of vacancies:
     ````
     PROGRAMMING_LANGUAGES=Python, Java, JavaScript, C#, C/C++, PHP, Kotlin, Ruby
     ````
-
-### Project Goals
-
-The code is written for educational purposes on online-course for web-developers [dvmn.org](https://dvmn.org/).
